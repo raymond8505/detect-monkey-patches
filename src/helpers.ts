@@ -45,9 +45,9 @@ export function findMonkeyPatches(nativeTypeName: string): MonkeyPatches {
   // fix this with correct types
   const nativeType = window[nativeTypeName as unknown as number] as unknown as FakeType;
 
-  const foundMonkeyPatches:MonkeyPatches = [];
-
   if (!nativeType.prototype) return [];
+
+  const foundMonkeyPatches:MonkeyPatches = [];
 
   const props = Object.getOwnPropertyNames(nativeType.prototype);
 

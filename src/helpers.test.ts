@@ -1,4 +1,5 @@
-import { getNativeDef,isNative } from "./helpers"
+
+import { findMonkeyPatches, getNativeDef,isNative } from "./helpers"
 
 describe('helpers',()=>{
     describe('getNativeDef',() => {
@@ -15,6 +16,37 @@ describe('helpers',()=>{
         })
         it('returns true if function definition matches a known alias',()=>{
             expect(isNative('fooRight',getNativeDef('fooEnd'))).toBe(true)
+        })
+    })
+    describe('findMonkeyPatches',()=>{
+        beforeEach(()=>{
+            window = {}
+        })
+        it('skips anything without a prototype',()=>{
+            Object.defineProperty(window,'foo',{
+                value : {
+                   
+                        bar : () => {}
+                    
+                }
+            })
+            
+
+            expect(findMonkeyPatches('foo').length).toBe(0)
+        })
+
+        it('only checks functions',()=>{
+            Object.defineProperty(window,'foo',{
+                value : {
+                   prototype : {
+                       foo : "",
+                       bar: () => {}
+                   }
+                    
+                }
+            })
+
+            expect(findMonkeyPatches('foo')[0][0]).toBe('bar')
         })
     })
 })
