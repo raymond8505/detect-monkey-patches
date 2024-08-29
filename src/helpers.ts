@@ -20,36 +20,35 @@ export function isNative(funcName: string, funcDef: string) {
     ["toGMTString", "toUTCString"]
   ];
 
-  let synonymIsNative = false;
+  let aliasIsNative = false;
 
   for (let a in knownAliases) {
     const [original, alias] = knownAliases[a];
-
-    const aliasName = funcName.replace(original, alias);
-    const aliasNameRev = funcName.replace(alias, original);
 
     const aliasDef = getNativeDef(funcName.replace(original, alias));
     const aliasDefRev = getNativeDef(funcName.replace(alias, original));
 
     if (aliasDef === funcDef || aliasDefRev === funcDef) {
-      synonymIsNative = true;
+      aliasIsNative = true;
       break;
     }
   }
 
-  return synonymIsNative;
+  return aliasIsNative;
 }
 
 export interface FakeType {
   prototype: Record<string, { toString: () => string }>
 };
 
-export function findMonkeyPatches(nativeTypeName: string): Array<Array<string>> {
+export type MonkeyPatches = Array<Array<string>>
+
+export function findMonkeyPatches(nativeTypeName: string): MonkeyPatches {
 
   // fix this with correct types
   const nativeType = window[nativeTypeName as unknown as number] as unknown as FakeType;
 
-  const foundMonkeyPatches:Array<Array<string>> = [];
+  const foundMonkeyPatches:MonkeyPatches = [];
 
   if (!nativeType.prototype) return [];
 

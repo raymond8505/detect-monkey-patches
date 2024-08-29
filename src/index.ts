@@ -1,10 +1,10 @@
 import {suppressPromiseRejections,findMonkeyPatches} from './helpers'
-
+import type {MonkeyPatches} from './helpers'
 performance.mark("start");
 
 window.addEventListener("unhandledrejection", suppressPromiseRejections);
 
-type PatchedProps = Record<string,Array<Array<string>>>
+type PatchedProps = Record<string,MonkeyPatches>
 const windowProps = Object.getOwnPropertyNames(window);
 const patchedProps:PatchedProps = {}
 
