@@ -4,6 +4,8 @@ module.exports = {
 
   entry: './src/index.ts',
 
+  mode: 'development',
+
   output: {
 
     filename: 'detect-monkey-patches.js',

@@ -4,7 +4,7 @@
   "description": "Detects non native implementations of native functions in javascript. Good if you need to ensure your js environment is what you're expecting it to be",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "webpack",
     "start": "webpack serve"
   },
@@ -19,9 +19,15 @@
   },
   "homepage": "https://github.com/raymond8505/detect-monkey-patches#readme",
   "dependencies": {
+    "@babel/preset-env": "^7.25.4",
     "typescript": "^5.5.4"
   },
   "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-typescript": "^7.24.7",
+    "@types/jest": "^29.5.12",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
     "ts-loader": "^9.5.1",
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4",

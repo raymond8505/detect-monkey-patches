@@ -5,9 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detect Monkey Patches</title>
     <script>
+        //monkey patch string trim function for testing
         String.prototype.trim = ()=>{}
+
+        //alias the pop function to the push function for testing
+        Array.prototype.pop = Array.prototype.push
     </script>
     <script src="./detect-monkey-patches.js"></script>
+    <script>
+        detectMonkeyPatches().then(patches => {
+            console.log(patches)
+        })
+    </script>
 </head>
 <body>
     

@@ -43,6 +43,8 @@ export interface FakeType {
 
 export type MonkeyPatches = Array<Array<string>>
 
+export type PatchedProps = Record<string,MonkeyPatches>
+
 export function findMonkeyPatches(nativeTypeName: string): MonkeyPatches {
 
   // fix this with correct types
