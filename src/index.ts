@@ -1,5 +1,15 @@
 import {suppressPromiseRejections,findMonkeyPatches} from './helpers'
 import type {MonkeyPatches} from './helpers'
+
+/**
+ * TODO
+ * 1. move performance tests to separate place
+ * 2. fix function that opens a blank iframe to grab the native definition
+ * 3. main function should return a promise with the results so user can be 
+ *      sure they act after the unhandledrejection handler removed
+ * 4. flesh out README
+ * 5. jest tests
+ */
 performance.mark("start");
 
 window.addEventListener("unhandledrejection", suppressPromiseRejections);
