@@ -1,7 +1,7 @@
 
 
-export const getNativeDef = (funcName) => `function ${funcName}() { [native code] }`;
-export function isNative(funcName, funcDef) {
+export const getNativeDef = (funcName:string) => `function ${funcName}() { [native code] }`;
+export function isNative(funcName:string, funcDef:string) {
   // if the definition doesnt even contain "native code" then it's not native
   // no need to check synonyms
   if (funcDef.indexOf("{ [native code] }") === -1) return false;
@@ -39,8 +39,11 @@ export function isNative(funcName, funcDef) {
   return synonymIsNative;
 }
 
-export function findMonkeyPatches(nativeTypeName) {
-  const nativeType = window[nativeTypeName];
+export function findMonkeyPatches(nativeTypeName:string) {
+
+  // fix this with correct types
+  const nativeType = window[nativeTypeName as unknown as number] as unknown as {prototype:Object};
+
   const foundMonkeyPatches = [];
 
   if (!nativeType.prototype) return [];
@@ -82,31 +85,9 @@ performance.mark("start");
 
 // if a property is a rejected promise and we touch it, it will throw an error
 // so suppress the event while we work
-const suppressPromiseRejections = (event) => {
+export const suppressPromiseRejections = (event) => {
   event.preventDefault();
 };
-window.addEventListener("unhandledrejection", suppressPromiseRejections);
-
-const windowProps = Object.getOwnPropertyNames(window);
-
-for (let prop in windowProps) {
-  const propName = windowProps[prop];
-
-  // we're only interested in types
-  if (/[A-Z]/.test(propName[0])) {
-    const mps = findMonkeyPatches(propName);
-
-    if (mps.length) {
-      patchedProps.push([propName, mps]);
-    }
-  }
-}
-
-// remove the suppression after we're done
-// 1ms timeout to make the call async else it gets removed before the Promises actually reject
-setTimeout(() => {
-  window.removeEventListener("unhandledrejection", suppressPromiseRejections);
-}, 1);
 
 performance.mark("end");
 
