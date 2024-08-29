@@ -1,4 +1,12 @@
-
+// sometimes native functions will alias others
+// eg: trimRight => trimEnd
+// eg: trimLeft => trimStart
+export const knownAliases = [
+  ["Left", "Start"],
+  ["Right", "End"],
+  ["keys", "values"],
+  ["toGMTString", "toUTCString"]
+];
 
 export const getNativeDef = (funcName: string) => `function ${funcName}() { [native code] }`;
 
@@ -9,16 +17,6 @@ export function isNative(funcName: string, funcDef: string) {
 
   // definition matches function name exactly
   if (funcDef === getNativeDef(funcName)) return true;
-
-  // sometimes native functions will alias others
-  // eg: trimRight => trimEnd
-  // eg: trimLeft => trimStart
-  const knownAliases = [
-    ["Left", "Start"],
-    ["Right", "End"],
-    ["keys", "values"],
-    ["toGMTString", "toUTCString"]
-  ];
 
   let aliasIsNative = false;
 
