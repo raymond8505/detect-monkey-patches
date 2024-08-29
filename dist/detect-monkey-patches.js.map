@@ -1,0 +1,1 @@
+{"version":3,"file":"detect-monkey-patches.js","mappings":"mBAAAA,QAAQC,IAAI,O","sources":["webpack://detect-monkey-patches/./src/index.ts"],"sourcesContent":["console.log('test')"],"names":["console","log"],"sourceRoot":""}
