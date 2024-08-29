@@ -1,0 +1,19 @@
+{
+  "name": "detect-monkey-patches",
+  "version": "1.0.0",
+  "description": "Detects non native implementations of native functions in javascript. Good if you need to ensure your js environment is what you're expecting it to be",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raymond8505/detect-monkey-patches.git"
+  },
+  "author": "Raymond Selzer",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/raymond8505/detect-monkey-patches/issues"
+  },
+  "homepage": "https://github.com/raymond8505/detect-monkey-patches#readme"
+}
