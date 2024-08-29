@@ -1,5 +1,8 @@
 // sometimes native functions will alias others
 // eg: trimRight => trimEnd
+
+import { FakeType, MonkeyPatches } from "./types";
+
 // eg: trimLeft => trimStart
 export const knownAliases = [
   ["Left", "Start"],
@@ -35,13 +38,7 @@ export function isNative(funcName: string, funcDef: string) {
   return aliasIsNative;
 }
 
-export interface FakeType {
-  prototype: Record<string, { toString: () => string }>
-};
 
-export type MonkeyPatches = Array<Array<string>>
-
-export type PatchedProps = Record<string,MonkeyPatches>
 
 export function findMonkeyPatches(nativeTypeName: string): MonkeyPatches {
 

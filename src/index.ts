@@ -1,5 +1,5 @@
 import {suppressPromiseRejections,findMonkeyPatches} from './helpers'
-import type {MonkeyPatches,PatchedProps} from './helpers'
+import type {PatchedProps} from './types'
 
 /**
  * TODO

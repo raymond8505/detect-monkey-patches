@@ -9,10 +9,19 @@
 /***/ ((__unused_webpack_module, exports) => {
 
 
+// sometimes native functions will alias others
+// eg: trimRight => trimEnd
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.suppressPromiseRejections = exports.getNativeDef = void 0;
+exports.suppressPromiseRejections = exports.getNativeDef = exports.knownAliases = void 0;
 exports.isNative = isNative;
 exports.findMonkeyPatches = findMonkeyPatches;
+// eg: trimLeft => trimStart
+exports.knownAliases = [
+    ["Left", "Start"],
+    ["Right", "End"],
+    ["keys", "values"],
+    ["toGMTString", "toUTCString"]
+];
 var getNativeDef = function (funcName) { return "function ".concat(funcName, "() { [native code] }"); };
 exports.getNativeDef = getNativeDef;
 function isNative(funcName, funcDef) {
@@ -23,18 +32,9 @@ function isNative(funcName, funcDef) {
     // definition matches function name exactly
     if (funcDef === (0, exports.getNativeDef)(funcName))
         return true;
-    // sometimes native functions will alias others
-    // eg: trimRight => trimEnd
-    // eg: trimLeft => trimStart
-    var knownAliases = [
-        ["Left", "Start"],
-        ["Right", "End"],
-        ["keys", "values"],
-        ["toGMTString", "toUTCString"]
-    ];
     var aliasIsNative = false;
-    for (var a in knownAliases) {
-        var _a = knownAliases[a], original = _a[0], alias = _a[1];
+    for (var a in exports.knownAliases) {
+        var _a = exports.knownAliases[a], original = _a[0], alias = _a[1];
         var aliasDef = (0, exports.getNativeDef)(funcName.replace(original, alias));
         var aliasDefRev = (0, exports.getNativeDef)(funcName.replace(alias, original));
         if (aliasDef === funcDef || aliasDefRev === funcDef) {
@@ -44,7 +44,6 @@ function isNative(funcName, funcDef) {
     }
     return aliasIsNative;
 }
-;
 function findMonkeyPatches(nativeTypeName) {
     // fix this with correct types
     var nativeType = window[nativeTypeName];
