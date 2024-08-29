@@ -1,9 +1,12 @@
 import {suppressPromiseRejections,findMonkeyPatches} from './helpers'
 
+performance.mark("start");
+
 window.addEventListener("unhandledrejection", suppressPromiseRejections);
 
+type PatchedProps = Record<string,Array<Array<string>>>
 const windowProps = Object.getOwnPropertyNames(window);
-const patchedProps = []
+const patchedProps:PatchedProps = {}
 
 for (let prop in windowProps) {
   const propName = windowProps[prop];
@@ -13,7 +16,7 @@ for (let prop in windowProps) {
     const mps = findMonkeyPatches(propName);
 
     if (mps.length) {
-      patchedProps.push([propName, mps]);
+      patchedProps[propName] = mps
     }
   }
 }
@@ -23,3 +26,11 @@ for (let prop in windowProps) {
 setTimeout(() => {
   window.removeEventListener("unhandledrejection", suppressPromiseRejections);
 }, 1);
+
+performance.mark("end");
+
+console.log(
+  patchedProps,
+  performance.measure("start to end", "start", "end").duration,
+  "ms"
+);

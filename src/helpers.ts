@@ -1,7 +1,8 @@
 
 
-export const getNativeDef = (funcName:string) => `function ${funcName}() { [native code] }`;
-export function isNative(funcName:string, funcDef:string) {
+export const getNativeDef = (funcName: string) => `function ${funcName}() { [native code] }`;
+
+export function isNative(funcName: string, funcDef: string) {
   // if the definition doesnt even contain "native code" then it's not native
   // no need to check synonyms
   if (funcDef.indexOf("{ [native code] }") === -1) return false;
@@ -39,12 +40,16 @@ export function isNative(funcName:string, funcDef:string) {
   return synonymIsNative;
 }
 
-export function findMonkeyPatches(nativeTypeName:string) {
+export interface FakeType {
+  prototype: Record<string, { toString: () => string }>
+};
+
+export function findMonkeyPatches(nativeTypeName: string): Array<Array<string>> {
 
   // fix this with correct types
-  const nativeType = window[nativeTypeName as unknown as number] as unknown as {prototype:Object};
+  const nativeType = window[nativeTypeName as unknown as number] as unknown as FakeType;
 
-  const foundMonkeyPatches = [];
+  const foundMonkeyPatches:Array<Array<string>> = [];
 
   if (!nativeType.prototype) return [];
 
@@ -61,17 +66,25 @@ export function findMonkeyPatches(nativeTypeName:string) {
       // we're only testing functions
       if (propType !== "function") continue;
 
+      const funcDef = nativeType.prototype[funcName].toString();
+
       // check the constructor against its type name
-      if (funcName === "constructor" && !isNative(nativeTypeName, funcDef)) {
-        foundMonkeyPatches.push([funcName, funcDef]);
+      // if (funcName === "constructor" && !isNative(nativeTypeName, funcDef)) {
+      //   foundMonkeyPatches.push([funcName, funcDef]);
+      //   continue;
+      // }
+      if(funcName === "constructor")
+      {
+        continue
       }
 
-      const funcDef = nativeType.prototype[funcName].toString();
       const funcIsNative = isNative(funcName, funcDef);
 
+      //console.log({ funcName, funcDef, funcIsNative, nativeTypeName })
       if (!funcIsNative) {
         foundMonkeyPatches.push([funcName, funcDef]);
       }
+
     } catch (e) {
       continue;
     }
@@ -80,19 +93,8 @@ export function findMonkeyPatches(nativeTypeName:string) {
   return foundMonkeyPatches;
 }
 
-const patchedProps = [];
-performance.mark("start");
-
 // if a property is a rejected promise and we touch it, it will throw an error
 // so suppress the event while we work
-export const suppressPromiseRejections = (event) => {
+export const suppressPromiseRejections = (event: Event) => {
   event.preventDefault();
 };
-
-performance.mark("end");
-
-console.log(
-  patchedProps,
-  performance.measure("start to end", "start", "end").duration,
-  "ms"
-);
