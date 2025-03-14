@@ -15,7 +15,8 @@ performance.mark("start");
 
 export function detectMonkeyPatches(): Promise<PatchedProps> {
 
-  return new Promise((resolve) => {
+  console.log('detecting monkey patches')
+  return new Promise((resolve, reject) => {
 
     window.addEventListener("unhandledrejection", suppressPromiseRejections);
 
@@ -35,9 +36,14 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
         }
       }
       else if (typeof window[propName as unknown as number] === 'function' && propName !== 'detectMonkeyPatches') {
-        const propDef = window[propName as unknown as number].toString()
-        if (!isNative(propName, propDef)) {
-          patchedProps[propName] = propDef
+        try {
+          const propDef = window[propName as unknown as number].toString()
+          if (!isNative(propName, propDef)) {
+            patchedProps[propName] = propDef
+          }
+        }
+        catch (e) {
+          reject(e)
         }
       }
 
