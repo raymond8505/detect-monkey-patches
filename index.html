@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detect Monkey Patches</title>
+    <script src="/detect-monkey-patches.js"></script>
+    <script defer>
+        window.fetch = () => { }
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('dom load')
+            window.detectMonkeyPatches().then(console.log)
+        })
+    </script>
+</head>
+
+<body>
+    <h1>Open Devtools console</h1>
+</body>
+
+</html>

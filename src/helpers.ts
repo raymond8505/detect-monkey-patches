@@ -8,7 +8,14 @@ export const knownAliases = [
   ["Left", "Start"],
   ["Right", "End"],
   ["keys", "values"],
-  ["toGMTString", "toUTCString"]
+  ["toGMTString", "toUTCString"],
+  ["webkitMediaStream", "MediaStream"],
+  ["webkitRTCPeerConnection", "RTCPeerConnection"],
+  ["webkitSpeechGrammar", "SpeechGrammar"],
+  ["webkitSpeechRecognition", "SpeechRecognition"],
+  ["webkitSpeechRecognitionError", "SpeechRecognitionErrorEvent"],
+  ["webkitSpeechRecognitionEvent", "SpeechRecognitionEvent"],
+  ["webkitURL", "URL"],
 ];
 
 export const getNativeDef = (funcName: string) => `function ${funcName}() { [native code] }`;
@@ -47,7 +54,7 @@ export function findMonkeyPatches(nativeTypeName: string): MonkeyPatches {
 
   if (!nativeType.prototype) return [];
 
-  const foundMonkeyPatches:MonkeyPatches = [];
+  const foundMonkeyPatches: MonkeyPatches = [];
 
   const props = Object.getOwnPropertyNames(nativeType.prototype);
 
@@ -69,8 +76,7 @@ export function findMonkeyPatches(nativeTypeName: string): MonkeyPatches {
       //   foundMonkeyPatches.push([funcName, funcDef]);
       //   continue;
       // }
-      if(funcName === "constructor")
-      {
+      if (funcName === "constructor") {
         continue
       }
 

@@ -37,6 +37,8 @@ module.exports = {
 
     path: path.resolve(__dirname, 'dist'),
 
+    publicPath: 'auto',
+
   },
 
   module: {
@@ -66,7 +68,7 @@ module.exports = {
   devServer: {
 
     static: {
-      directory: path.join(__dirname, 'dist')
+      directory: __dirname
     },
 
     compress: true,

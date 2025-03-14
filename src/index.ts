@@ -1,5 +1,5 @@
-import {suppressPromiseRejections,findMonkeyPatches} from './helpers'
-import type {PatchedProps} from './types'
+import { suppressPromiseRejections, findMonkeyPatches, isNative } from './helpers'
+import type { PatchedProps } from './types'
 
 /**
  * TODO
@@ -9,43 +9,55 @@ import type {PatchedProps} from './types'
  *      sure they act after the unhandledrejection handler removed
  * 4. flesh out README
  * 5. jest tests
+ * 6. make npm package
  */
 performance.mark("start");
 
-export function detectMonkeyPatches():Promise<PatchedProps> {
+export function detectMonkeyPatches(): Promise<PatchedProps> {
+
   return new Promise((resolve) => {
 
     window.addEventListener("unhandledrejection", suppressPromiseRejections);
-    
+
     const windowProps = Object.getOwnPropertyNames(window);
-    const patchedProps:PatchedProps = {}
-    
+    const patchedProps: PatchedProps = {}
+
     for (let prop in windowProps) {
-      const propName = windowProps[prop];
-    
+      const propName: string = windowProps[prop];
+
+
       // we're only interested in types
       if (/[A-Z]/.test(propName[0])) {
         const mps = findMonkeyPatches(propName);
-    
+
         if (mps.length) {
           patchedProps[propName] = mps
         }
       }
+      else if (typeof window[propName as unknown as number] === 'function' && propName !== 'detectMonkeyPatches') {
+        const propDef = window[propName as unknown as number].toString()
+        if (!isNative(propName, propDef)) {
+          patchedProps[propName] = propDef
+        }
+      }
+
     }
-    
+
+
+
     // remove the suppression after we're done
     // 1ms timeout to make the call async else it gets removed before the Promises actually reject
     setTimeout(() => {
       window.removeEventListener("unhandledrejection", suppressPromiseRejections);
       resolve(patchedProps)
     }, 1);
+
   })
 }
 
-if(!window.hasOwnProperty('detectMonkeyPatches'))
-{  
-  Object.defineProperty(window,'detectMonkeyPatches',{
-    value : detectMonkeyPatches
+if (!window.hasOwnProperty('detectMonkeyPatches')) {
+  Object.defineProperty(window, 'detectMonkeyPatches', {
+    value: detectMonkeyPatches
   })
 }
 
