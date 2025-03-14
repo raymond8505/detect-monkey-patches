@@ -1,14 +1,32 @@
 const path = require('path');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
 
-  entry: './src/index.ts',
+  entry: {
+    'detect-monkey-patches': './src/index.ts',
+    'bookmarklet': './src/bookmarklet.ts',
+  },
 
   mode: 'development',
 
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          format: {
+            comments: false,
+          },
+        },
+        extractComments: false,
+      }),
+    ],
+  },
+
   output: {
 
-    filename: 'detect-monkey-patches.js',
+    filename: '[name].js',
 
     path: path.resolve(__dirname, 'dist'),
 
@@ -38,12 +56,10 @@ module.exports = {
 
   },
 
-  devtool: 'source-map',
-
   devServer: {
 
-    static : {
-        directory: path.join(__dirname,'dist')
+    static: {
+      directory: path.join(__dirname, 'dist')
     },
 
     compress: true,
@@ -51,5 +67,6 @@ module.exports = {
     port: 9000,
 
   },
+
 
 };
