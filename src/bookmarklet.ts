@@ -1,3 +1,4 @@
+import { log } from "./helpers"
 import { PatchedProps } from "./types"
 
 declare global {
@@ -12,10 +13,10 @@ fetch(`https://raw.githubusercontent.com/raymond8505/detect-monkey-patches/refs/
     window.eval(script)
     window.detectMonkeyPatches!().then(patches => {
         if (Object.keys(patches).length) {
-            console.log('%c FOUND MONKEY PATCHES', 'font-weight:bold;font-size:16px;', patches)
+            log('FOUND MONKEY PATCHES', patches)
         }
         else {
-            console.log('%c NO MONKEY PATCHES FOUND', 'font-weight:bold;font-size:16px;')
+            log('NO MONKEY PATCHES FOUND')
         }
     }).catch(e => console.error("Error detecting monkey patches", e))
 }))

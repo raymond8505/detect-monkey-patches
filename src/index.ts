@@ -1,4 +1,4 @@
-import { suppressPromiseRejections, findMonkeyPatches, isNative } from './helpers'
+import { suppressPromiseRejections, findMonkeyPatches, isNative, log } from './helpers'
 import type { PatchedProps } from './types'
 
 /**
@@ -12,11 +12,9 @@ import type { PatchedProps } from './types'
  * 6. make npm package
  */
 
-
-console.log('detecting monkey patches', 1)
 export function detectMonkeyPatches(): Promise<PatchedProps> {
 
-  console.log('detecting monkey patches')
+  log('detecting monkey patches')
   return new Promise((resolve, reject) => {
 
     window.addEventListener("unhandledrejection", suppressPromiseRejections);

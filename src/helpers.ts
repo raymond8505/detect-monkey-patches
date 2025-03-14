@@ -45,6 +45,10 @@ export function isNative(funcName: string, funcDef: string) {
   return aliasIsNative;
 }
 
+export function log(label: string, ...args: unknown[]) {
+  console.log(`%c ${label}`, 'font-weight:bold;font-size:16px;', ...args)
+}
+
 export function getKnownWindowPropertyNames() {
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
