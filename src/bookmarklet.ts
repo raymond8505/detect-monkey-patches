@@ -5,7 +5,9 @@ declare global {
         detectMonkeyPatches: () => Promise<PatchedProps>
     }
 }
-fetch("https://raw.githubusercontent.com/raymond8505/detect-monkey-patches/refs/heads/main/dist/detect-monkey-patches.js").then(r => r.text().then((script) => {
+fetch(`https://raw.githubusercontent.com/raymond8505/detect-monkey-patches/refs/heads/main/dist/detect-monkey-patches.js`, {
+    cache: 'reload'
+}).then(r => r.text().then((script) => {
 
     window.eval(script)
     window.detectMonkeyPatches!().then(patches => {

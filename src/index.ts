@@ -12,6 +12,7 @@ import type { PatchedProps } from './types'
  * 6. make npm package
  */
 
+
 console.log('detecting monkey patches', 1)
 export function detectMonkeyPatches(): Promise<PatchedProps> {
 
