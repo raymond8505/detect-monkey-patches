@@ -45,7 +45,30 @@ export function isNative(funcName: string, funcDef: string) {
   return aliasIsNative;
 }
 
+export function getKnownWindowFunctionNames() {
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = "about:blank";
+  document.body.appendChild(iframe);
 
+  const names = []
+
+  const windowProps = Object.getOwnPropertyNames(iframe.contentWindow);
+
+  if (!iframe.contentWindow) return []
+
+  for (let prop in windowProps) {
+    const propName: string = windowProps[prop];
+
+    if (typeof iframe.contentWindow[propName as unknown as number] === 'function') {
+      names.push(propName)
+    }
+  }
+
+  document.body.removeChild(iframe);
+
+  return names;
+}
 
 export function findMonkeyPatches(nativeTypeName: string): MonkeyPatches {
 
