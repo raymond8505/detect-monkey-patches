@@ -27,7 +27,7 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
 
       for (let prop in windowProps) {
         const propName: string = windowProps[prop];
-
+        const descriptor = Object.getOwnPropertyDescriptor(window, propName)
         if (!knownWindowPropertyNames.includes(propName)) continue
 
         // we're only interested in types
@@ -39,7 +39,7 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
           }
         }
         else if (
-          typeof window[propName as unknown as number] === 'function'
+          typeof descriptor?.value === 'function'
         ) {
 
           const propDef = window[propName as unknown as number].toString()
