@@ -20,44 +20,43 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
 
     window.addEventListener("unhandledrejection", suppressPromiseRejections);
 
-    const windowProps = Object.getOwnPropertyNames(window);
-    const patchedProps: PatchedProps = {}
+    try {
+      const windowProps = Object.getOwnPropertyNames(window);
+      const patchedProps: PatchedProps = {}
 
-    for (let prop in windowProps) {
-      const propName: string = windowProps[prop];
+      for (let prop in windowProps) {
+        const propName: string = windowProps[prop];
 
 
-      // we're only interested in types
-      if (/[A-Z]/.test(propName[0])) {
-        const mps = findMonkeyPatches(propName);
+        // we're only interested in types
+        if (/[A-Z]/.test(propName[0])) {
+          const mps = findMonkeyPatches(propName);
 
-        if (mps.length) {
-          patchedProps[propName] = mps
+          if (mps.length) {
+            patchedProps[propName] = mps
+          }
         }
-      }
-      else if (typeof window[propName as unknown as number] === 'function' && propName !== 'detectMonkeyPatches') {
-        try {
+        else if (typeof window[propName as unknown as number] === 'function' && propName !== 'detectMonkeyPatches') {
+
           const propDef = window[propName as unknown as number].toString()
           if (!isNative(propName, propDef)) {
             patchedProps[propName] = propDef
           }
+
         }
-        catch (e) {
-          reject(e)
-        }
+
       }
 
+      // remove the suppression after we're done
+      // 1ms timeout to make the call async else it gets removed before the Promises actually reject
+      setTimeout(() => {
+        window.removeEventListener("unhandledrejection", suppressPromiseRejections);
+        resolve(patchedProps)
+      }, 1);
     }
-
-
-
-    // remove the suppression after we're done
-    // 1ms timeout to make the call async else it gets removed before the Promises actually reject
-    setTimeout(() => {
-      window.removeEventListener("unhandledrejection", suppressPromiseRejections);
-      resolve(patchedProps)
-    }, 1);
-
+    catch (e) {
+      reject(e)
+    }
   })
 }
 
