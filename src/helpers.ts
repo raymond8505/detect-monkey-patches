@@ -45,7 +45,7 @@ export function isNative(funcName: string, funcDef: string) {
   return aliasIsNative;
 }
 
-export function getKnownWindowFunctionNames() {
+export function getKnownWindowPropertyNames() {
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
   iframe.src = "about:blank";

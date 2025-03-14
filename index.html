@@ -8,6 +8,9 @@
     <script src="/detect-monkey-patches.js"></script>
     <script defer src="/bookmarklet.js"></script>
     <script>
+        window.Foo = () => {
+            console.log('Foo')
+        }
         window.alert = () => { }
     </script>
 </head>

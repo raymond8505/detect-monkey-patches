@@ -1,4 +1,4 @@
-import { suppressPromiseRejections, findMonkeyPatches, isNative, getKnownWindowFunctionNames } from './helpers'
+import { suppressPromiseRejections, findMonkeyPatches, isNative, getKnownWindowPropertyNames } from './helpers'
 import type { PatchedProps } from './types'
 
 /**
@@ -23,11 +23,12 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
     try {
       const windowProps = Object.getOwnPropertyNames(window);
       const patchedProps: PatchedProps = {}
-      const knownWindowFunctionNames = getKnownWindowFunctionNames()
+      const knownWindowPropertyNames = getKnownWindowPropertyNames()
 
       for (let prop in windowProps) {
         const propName: string = windowProps[prop];
 
+        if (!knownWindowPropertyNames.includes(propName)) continue
 
         // we're only interested in types
         if (/[A-Z]/.test(propName[0])) {
@@ -38,9 +39,7 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
           }
         }
         else if (
-          //typeof window[propName as unknown as number] === 'function' 
-          knownWindowFunctionNames.includes(propName)
-          //&& propName !== 'detectMonkeyPatches'
+          typeof window[propName as unknown as number] === 'function'
         ) {
 
           const propDef = window[propName as unknown as number].toString()
