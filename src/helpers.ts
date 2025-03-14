@@ -49,50 +49,49 @@ export function isNative(funcName: string, funcDef: string) {
 
 export function findMonkeyPatches(nativeTypeName: string): MonkeyPatches {
 
-  // fix this with correct types
-  const nativeType = window[nativeTypeName as unknown as number] as unknown as FakeType;
+  try {
+    const nativeType = window[nativeTypeName as unknown as number] as unknown as FakeType;
 
-  if (!nativeType?.prototype) return [];
+    if (!nativeType?.prototype) return [];
 
-  const foundMonkeyPatches: MonkeyPatches = [];
+    const foundMonkeyPatches: MonkeyPatches = [];
 
-  const props = Object.getOwnPropertyNames(nativeType.prototype);
+    const props = Object.getOwnPropertyNames(nativeType.prototype);
 
-  for (let propName in props) {
-    const funcName = props[propName];
+    for (let propName in props) {
 
-    // wrap in try-catch to avoid breaking the loop
-    // for "illegal invocation" errors
-    try {
-      const propType = typeof nativeType.prototype[funcName];
+      // wrap in try-catch to avoid breaking the loop
+      // for "illegal invocation" errors
+      try {
+        const funcName = props[propName];
+        const descriptor = Object.getOwnPropertyDescriptor(nativeType.prototype, funcName)
+        const propType = typeof descriptor?.value;
 
-      // we're only testing functions
-      if (propType !== "function") continue;
+        // we're only testing functions
+        if (propType !== "function") continue;
 
-      const funcDef = nativeType.prototype[funcName].toString();
+        const funcDef = nativeType.prototype[funcName].toString();
 
-      // check the constructor against its type name
-      // if (funcName === "constructor" && !isNative(nativeTypeName, funcDef)) {
-      //   foundMonkeyPatches.push([funcName, funcDef]);
-      //   continue;
-      // }
-      if (funcName === "constructor") {
-        continue
+        if (funcName === "constructor") {
+          continue
+        }
+
+        const funcIsNative = isNative(funcName, funcDef);
+
+        if (!funcIsNative) {
+          foundMonkeyPatches.push([funcName, funcDef]);
+        }
+
+      } catch (e) {
+        continue;
       }
-
-      const funcIsNative = isNative(funcName, funcDef);
-
-      //console.log({ funcName, funcDef, funcIsNative, nativeTypeName })
-      if (!funcIsNative) {
-        foundMonkeyPatches.push([funcName, funcDef]);
-      }
-
-    } catch (e) {
-      continue;
     }
-  }
 
-  return foundMonkeyPatches;
+    return foundMonkeyPatches;
+  }
+  catch {
+    return []
+  }
 }
 
 // if a property is a rejected promise and we touch it, it will throw an error
