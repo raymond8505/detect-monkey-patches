@@ -11,7 +11,7 @@ import type { PatchedProps } from './types'
  * 5. jest tests
  * 6. make npm package
  */
-performance.mark("start");
+
 console.log('detecting monkey patches', 1)
 export function detectMonkeyPatches(): Promise<PatchedProps> {
 
@@ -66,11 +66,3 @@ if (!window.hasOwnProperty('detectMonkeyPatches')) {
     value: detectMonkeyPatches
   })
 }
-
-// performance.mark("end");
-
-// console.log(
-//   patchedProps,
-//   performance.measure("start to end", "start", "end").duration,
-//   "ms"
-// );
