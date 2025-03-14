@@ -10,10 +10,10 @@ fetch("https://raw.githubusercontent.com/raymond8505/detect-monkey-patches/refs/
     window.eval(script)
     window.detectMonkeyPatches!().then(patches => {
         if (Object.keys(patches).length) {
-            console.log('FOUND MONKEY PATCHES', patches)
+            console.log('%cFOUND MONKEY PATCHES', 'font-weight:bold;font-size:16px;', patches)
         }
         else {
-            console.log('No monkey patches found')
+            console.log('%cNO MONKEY PATCHES FOUND', 'font-weight:bold;font-size:16px;')
         }
     })
 }))

@@ -17,7 +17,14 @@ module.exports = {
         terserOptions: {
           format: {
             comments: false,
+            ecma: 2015,
+            source_map: false,
+            indent_level: 0
           },
+          compress: {
+            ecma: 2015,
+
+          }
         },
         extractComments: false,
       }),
