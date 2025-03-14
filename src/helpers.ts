@@ -60,9 +60,8 @@ export function getKnownWindowPropertyNames() {
   for (let prop in windowProps) {
     const propName: string = windowProps[prop];
 
-    if (typeof iframe.contentWindow[propName as unknown as number] === 'function') {
-      names.push(propName)
-    }
+    names.push(propName)
+
   }
 
   document.body.removeChild(iframe);
