@@ -2,7 +2,8 @@
 
 Detect any native Javascript object functions that have had their definition overriden by a custom function, or "monkey patched".
 
-Useful for making sure your javascript environment will work as expected.
+Can be used to ensure javascript environment will work as expected. 
+Used as a bookmarklet it can help troubleshooting third party websites.
 
 # Usage
 
