@@ -15,5 +15,5 @@ fetch("https://raw.githubusercontent.com/raymond8505/detect-monkey-patches/refs/
         else {
             console.log('%cNO MONKEY PATCHES FOUND', 'font-weight:bold;font-size:16px;')
         }
-    })
+    }).catch(e => console.error("Error detecting monkey patches", e))
 }))
