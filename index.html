@@ -11,7 +11,15 @@
         window.Foo = () => {
             console.log('Foo')
         }
-        window.alert = () => { }
+        window.alert = (...args) => {
+            console.log(...args)
+        }
+
+        alert('patched test')
+
+        document.addEventListener('DOMContentLoaded', () => {
+            //fixMonkeyPatch('alert')('fixed test')
+        })
     </script>
 </head>
 

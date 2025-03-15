@@ -60,9 +60,34 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
     }
   })
 }
+let cleanIFrame: HTMLIFrameElement | undefined = undefined
+
+export const fixMonkeyPatch = (patchedPropName: string) => {
+  if (!cleanIFrame) {
+    cleanIFrame = document.createElement('iframe')
+    cleanIFrame.src = 'about:blank'
+    cleanIFrame.style.display = 'none'
+    cleanIFrame.setAttribute('id', 'detect-monkey-patches__clean-iframe')
+
+    // the iframe must stay in DOM for 
+    document.body.appendChild(cleanIFrame)
+  }
+
+  if (!cleanIFrame.contentWindow) {
+    throw new Error("Detect Monkey Patches Error: couldn't create clean iframe")
+  }
+
+  return cleanIFrame.contentWindow[patchedPropName as unknown as number]
+}
 
 if (!window.hasOwnProperty('detectMonkeyPatches')) {
   Object.defineProperty(window, 'detectMonkeyPatches', {
     value: detectMonkeyPatches
+  })
+}
+
+if (!window.hasOwnProperty('fixMonkeyPatch')) {
+  Object.defineProperty(window, 'fixMonkeyPatch', {
+    value: fixMonkeyPatch
   })
 }
