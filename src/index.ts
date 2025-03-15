@@ -1,10 +1,11 @@
-import { suppressPromiseRejections, findMonkeyPatches, isNative, log, getKnownWindowPropertyNames, getCleanIframe, removeCleanIframe } from './helpers'
+import { suppressPromiseRejections, findMonkeyPatches, isNative, log, getKnownWindowPropertyNames, getCleanIframe, removeCleanIframe, safeTypeCheck } from './helpers'
 import type { PatchedProps } from './types'
 
 /**
  * TODO
- * 1. jest tests
- * 2. make npm package
+ * - jest tests
+ * - split out adding to window object so can be proper module
+ * - make npm package
  */
 
 export function detectMonkeyPatches(): Promise<PatchedProps> {
@@ -22,17 +23,20 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
       for (let prop in windowProps) {
         const propName: string = windowProps[prop];
 
+        // we only care about known window functions
         if (!knownWindowPropertyNames.includes(propName)) continue;
+        if (safeTypeCheck(window, propName) !== 'function') continue;
 
         // if the prop is a class
-        if (/[A-Z]/.test(propName[0])) {
+        //if (/[A-Z]/.test(propName[0])) {
+        if ((window[propName as unknown as number] as unknown as Function).prototype) {
           const mps = findMonkeyPatches(propName);
 
           if (mps.length) {
             patchedProps[propName] = mps
           }
         }
-        else if (typeof window[propName as unknown as number] === 'function') {
+        else if (safeTypeCheck(window, propName) === 'function') {
 
           const propDef = window[propName as unknown as number].toString()
           if (!isNative(propName, propDef)) {

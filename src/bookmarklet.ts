@@ -1,11 +1,6 @@
 import { log } from "./helpers"
 import { PatchedProps } from "./types"
 
-declare global {
-    interface Window {
-        detectMonkeyPatches: () => Promise<PatchedProps>
-    }
-}
 fetch(`https://raw.githubusercontent.com/raymond8505/detect-monkey-patches/refs/heads/main/dist/detect-monkey-patches.js`, {
     cache: 'reload'
 }).then(r => r.text().then((script) => {

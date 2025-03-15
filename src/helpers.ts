@@ -3,7 +3,6 @@
 
 import { FakeType, MonkeyPatches } from "./types";
 
-// eg: trimLeft => trimStart
 export const knownAliases = [
   ["Left", "Start"],
   ["Right", "End"],
