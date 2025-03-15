@@ -1,7 +1,6 @@
 describe('index', () => {
     describe('detectMonkeyPatches', () => {
         it('only checks known window functions', () => { })
-        it('')
     })
     describe('fixMonkeyPatch', () => {
         it('throws an error if the prop is not a known window function', () => { })
