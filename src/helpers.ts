@@ -59,13 +59,15 @@ export function log(label: string, ...args: unknown[]) {
  */
 let cleanIFrame: HTMLIFrameElement | undefined = undefined
 
+export const CLEAN_IFRAME_ID = 'detect-monkey-patches__clean-iframe'
+
 export function getCleanIframe(): HTMLIFrameElement {
 
   if (!cleanIFrame) {
     cleanIFrame = document.createElement('iframe')
     cleanIFrame.src = 'about:blank'
     cleanIFrame.style.display = 'none'
-    cleanIFrame.setAttribute('id', 'detect-monkey-patches__clean-iframe')
+    cleanIFrame.setAttribute('id', CLEAN_IFRAME_ID)
 
     // the iframe must stay in DOM for 
     document.body.appendChild(cleanIFrame)
@@ -85,6 +87,7 @@ export function removeCleanIframe() {
  * @returns an array of known window property names
  */
 export function getKnownWindowPropertyNames() {
+  const shouldRemoveIframe = cleanIFrame === undefined;
   const iframe = getCleanIframe();
 
   if (!iframe.contentWindow) return []
@@ -99,7 +102,11 @@ export function getKnownWindowPropertyNames() {
     names.push(propName)
   }
 
-  removeCleanIframe();
+  // remove the iframe if we created it in this function 
+  // so we don't break any fixes that rely on it
+  if (shouldRemoveIframe) {
+    removeCleanIframe();
+  }
 
   return names;
 }
@@ -110,7 +117,6 @@ export function getDescriptorValue(obj: unknown, propName: string) {
  * Some things don't like being touched
  * so we need to check if we can access them
  * without throwing an error
- * @returns 
  */
 export function safeTypeCheck(obj: unknown, propName: string) {
   return typeof getDescriptorValue(obj, propName)
@@ -118,10 +124,10 @@ export function safeTypeCheck(obj: unknown, propName: string) {
 export function getDefinition(obj: unknown, propName: string) {
   return getDescriptorValue(obj, propName)?.toString() ?? "unknown"
 }
-export function findMonkeyPatches(nativeTypeName: string): MonkeyPatches {
+export function findClassMonkeyPatches(nativeTypeName: string): MonkeyPatches {
 
   try {
-    const nativeType = window[nativeTypeName as unknown as number] as unknown as FakeType;
+    const nativeType = getDescriptorValue(window, nativeTypeName) as FakeType;
 
     if (!nativeType?.prototype) return [];
 

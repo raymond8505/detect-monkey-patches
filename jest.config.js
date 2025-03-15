@@ -1,9 +1,10 @@
-module.exports = {  
-    transformIgnorePatterns: ['node_modules/(?!(sucrase)/)'],
-    transform: {
-      '^.+\\.(js|jsx|ts|tsx|mjs)$': 'babel-jest',
-    },
-globals: {
+module.exports = {
+  transformIgnorePatterns: ['node_modules/(?!(sucrase)/)'],
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx|mjs)$': 'babel-jest',
+  },
+  testEnvironment: 'jsdom',
+  globals: {
     window: {}
   }
-  }
+}

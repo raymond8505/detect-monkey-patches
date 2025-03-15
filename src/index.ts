@@ -1,9 +1,10 @@
-import { suppressPromiseRejections, findMonkeyPatches, isNative, getDescriptorValue, log, getKnownWindowPropertyNames, getCleanIframe, removeCleanIframe, safeTypeCheck, getDefinition } from './helpers'
+import { suppressPromiseRejections, findClassMonkeyPatches, isNative, getDescriptorValue, log, getKnownWindowPropertyNames, getCleanIframe, removeCleanIframe, safeTypeCheck, getDefinition } from './helpers'
 import type { PatchedProps } from './types'
 
 /**
  * TODO
  * - jest tests
+ * - make MonkeyPatches an object instead of a 2D array
  * - split out adding to window object so can be proper module
  * - make npm package
  */
@@ -41,7 +42,7 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
               patchedProps[propName] = getDescriptorValue(window, propName)
             }
             else {
-              const monkeyPatches = findMonkeyPatches(propName);
+              const monkeyPatches = findClassMonkeyPatches(propName);
 
               if (monkeyPatches.length) {
                 patchedProps[propName] = monkeyPatches

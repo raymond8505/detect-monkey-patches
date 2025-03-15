@@ -1,5 +1,5 @@
 
-import { findMonkeyPatches, getNativeDef, isNative } from "./helpers"
+import { CLEAN_IFRAME_ID, findClassMonkeyPatches, getCleanIframe, getKnownWindowPropertyNames, getNativeDef, isNative, removeCleanIframe } from "./helpers"
 
 describe('helpers', () => {
     describe('getNativeDef', () => {
@@ -18,6 +18,27 @@ describe('helpers', () => {
             expect(isNative('fooRight', getNativeDef('fooEnd'))).toBe(true)
         })
     })
+    describe('getCleanIframe', () => {
+        it('only creates the iframe once', () => {
+            const iframe = getCleanIframe()
+            const iframe2 = getCleanIframe()
+
+            expect(iframe).toBe(iframe2)
+        })
+    })
+    describe('getKnownWindowPropertyNames', () => {
+        it('only removes the iframe if it created the iframe', () => {
+            getCleanIframe()
+            getKnownWindowPropertyNames()
+            expect(document.body.querySelector(`#${CLEAN_IFRAME_ID}`)).toBeDefined()
+
+            removeCleanIframe()
+            expect(document.body.querySelector(`#${CLEAN_IFRAME_ID}`)).toBeNull()
+
+            getKnownWindowPropertyNames()
+            expect(document.body.querySelector(`#${CLEAN_IFRAME_ID}`)).toBeNull()
+        })
+    })
     describe('findMonkeyPatches', () => {
         beforeEach(() => {
             (window as unknown) = {}
@@ -31,8 +52,7 @@ describe('helpers', () => {
                 }
             })
 
-
-            expect(findMonkeyPatches('foo').length).toBe(0)
+            expect(findClassMonkeyPatches('foo').length).toBe(0)
         })
 
         it('only checks functions', () => {
@@ -46,7 +66,7 @@ describe('helpers', () => {
                 }
             })
 
-            expect(findMonkeyPatches('foo')[0][0]).toBe('bar')
+            expect(findClassMonkeyPatches('foo')[0][0]).toBe('bar')
         })
     })
 })
