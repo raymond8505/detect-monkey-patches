@@ -20,15 +20,17 @@ export const knownAliases = [
 
 export const getNativeDef = (funcName: string) => `function ${funcName}() { [native code] }`;
 
+/**
+ * Checks if the given function name and definition are native
+ * handles aliases as well
+ */
 export function isNative(funcName: string, funcDef: string) {
   // if the definition doesnt even contain "native code" then it's not native
-  // no need to check synonyms
+  // no need to check aliases
   if (funcDef.indexOf("{ [native code] }") === -1) return false;
 
   // definition matches function name exactly
   if (funcDef === getNativeDef(funcName)) return true;
-
-  let aliasIsNative = false;
 
   for (let a in knownAliases) {
     const [original, alias] = knownAliases[a];
@@ -37,40 +39,79 @@ export function isNative(funcName: string, funcDef: string) {
     const aliasDefRev = getNativeDef(funcName.replace(alias, original));
 
     if (aliasDef === funcDef || aliasDefRev === funcDef) {
-      aliasIsNative = true;
-      break;
+      return true;
     }
   }
 
-  return aliasIsNative;
+  return false;
 }
-
+/**
+ * Fancy logging
+ */
 export function log(label: string, ...args: unknown[]) {
   console.log(`%c ${label}`, 'font-weight:bold;font-size:16px;', ...args)
 }
 
+/**
+ * We only need to get the iframe once
+ * so we'll cache it here
+ */
+let cleanIFrame: HTMLIFrameElement | undefined = undefined
+
+export function getCleanIframe(): HTMLIFrameElement {
+
+  if (!cleanIFrame) {
+    cleanIFrame = document.createElement('iframe')
+    cleanIFrame.src = 'about:blank'
+    cleanIFrame.style.display = 'none'
+    cleanIFrame.setAttribute('id', 'detect-monkey-patches__clean-iframe')
+
+    // the iframe must stay in DOM for 
+    document.body.appendChild(cleanIFrame)
+  }
+
+  return cleanIFrame
+}
+
+export function removeCleanIframe() {
+  if (cleanIFrame) {
+    document.body.removeChild(cleanIFrame);
+    cleanIFrame = undefined;
+  }
+}
+
+/**
+ * @returns an array of known window property names
+ */
 export function getKnownWindowPropertyNames() {
-  const iframe = document.createElement("iframe");
-  iframe.style.display = "none";
-  iframe.src = "about:blank";
-  document.body.appendChild(iframe);
+  const iframe = getCleanIframe();
+
+  if (!iframe.contentWindow) return []
 
   const names = []
 
   const windowProps = Object.getOwnPropertyNames(iframe.contentWindow);
 
-  if (!iframe.contentWindow) return []
-
   for (let prop in windowProps) {
     const propName: string = windowProps[prop];
 
     names.push(propName)
-
   }
 
   document.body.removeChild(iframe);
 
   return names;
+}
+
+/**
+ * Some things don't like being touched
+ * so we need to check if we can access them
+ * without throwing an error
+ * @returns 
+ */
+export function safeTypeCheck(obj: unknown, propName: string) {
+  const descriptor = Object.getOwnPropertyDescriptor(obj, propName)
+  return typeof descriptor?.value;
 }
 
 export function findMonkeyPatches(nativeTypeName: string): MonkeyPatches {
@@ -90,8 +131,7 @@ export function findMonkeyPatches(nativeTypeName: string): MonkeyPatches {
       // for "illegal invocation" errors
       try {
         const funcName = props[propName];
-        const descriptor = Object.getOwnPropertyDescriptor(nativeType.prototype, funcName)
-        const propType = typeof descriptor?.value;
+        const propType = safeTypeCheck(nativeType.prototype, funcName)
 
         // we're only testing functions
         if (propType !== "function") continue;

@@ -1,15 +1,10 @@
-import { suppressPromiseRejections, findMonkeyPatches, isNative, log, getKnownWindowPropertyNames } from './helpers'
+import { suppressPromiseRejections, findMonkeyPatches, isNative, log, getKnownWindowPropertyNames, getCleanIframe, removeCleanIframe } from './helpers'
 import type { PatchedProps } from './types'
 
 /**
  * TODO
- * 1. move performance tests to separate place
- * 2. add a fix() function that opens a blank iframe to grab the native definition 
- * 3. main function should return a promise with the results so user can be 
- *      sure they act after the unhandledrejection handler removed
- * 4. flesh out README
- * 5. jest tests
- * 6. make npm package
+ * 1. jest tests
+ * 2. make npm package
  */
 
 export function detectMonkeyPatches(): Promise<PatchedProps> {
@@ -29,7 +24,7 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
 
         if (!knownWindowPropertyNames.includes(propName)) continue;
 
-        // we're only interested in types
+        // if the prop is a class
         if (/[A-Z]/.test(propName[0])) {
           const mps = findMonkeyPatches(propName);
 
@@ -49,29 +44,27 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
       }
 
       // remove the suppression after we're done
-      // 1ms timeout to make the call async else it gets removed before the Promises actually reject
+      // 1ms timeout to make the call async 
+      // else it gets removed before the Promises actually reject
       setTimeout(() => {
         window.removeEventListener("unhandledrejection", suppressPromiseRejections);
         resolve(patchedProps)
+        removeCleanIframe()
       }, 1);
     }
     catch (e) {
       reject(e)
+      removeCleanIframe()
     }
   })
 }
-let cleanIFrame: HTMLIFrameElement | undefined = undefined
 
 export const fixMonkeyPatch = (patchedPropName: string) => {
-  if (!cleanIFrame) {
-    cleanIFrame = document.createElement('iframe')
-    cleanIFrame.src = 'about:blank'
-    cleanIFrame.style.display = 'none'
-    cleanIFrame.setAttribute('id', 'detect-monkey-patches__clean-iframe')
-
-    // the iframe must stay in DOM for 
-    document.body.appendChild(cleanIFrame)
+  if (!getKnownWindowPropertyNames().includes(patchedPropName)) {
+    throw new Error(`Detect Monkey Patches Error: Unknown window property "${patchedPropName}"`)
   }
+
+  const cleanIFrame = getCleanIframe()
 
   if (!cleanIFrame.contentWindow) {
     throw new Error("Detect Monkey Patches Error: couldn't create clean iframe")
