@@ -1,4 +1,14 @@
-import { suppressPromiseRejections, findClassMonkeyPatches, isNative, getDescriptorValue, log, getKnownWindowPropertyNames, getCleanIframe, removeCleanIframe, safeTypeCheck, getDefinition } from './helpers'
+import {
+  suppressPromiseRejections,
+  findClassMonkeyPatches,
+  isNative,
+  getDescriptorValue,
+  log,
+  getKnownWindowPropertyNames,
+  getCleanIframe,
+  safeTypeCheck,
+  getDefinition
+} from './helpers'
 import type { PatchedProps } from './types'
 
 /**
@@ -60,12 +70,10 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
         setTimeout(() => {
           window.removeEventListener("unhandledrejection", suppressPromiseRejections);
           resolve(patchedProps)
-          removeCleanIframe()
         }, 1);
       }
       catch (e) {
         reject(e)
-        removeCleanIframe()
       }
     }
 
