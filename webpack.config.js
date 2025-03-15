@@ -19,11 +19,12 @@ module.exports = {
             comments: false,
             ecma: 2015,
             source_map: false,
-            indent_level: 0
+            indent_level: 0.
+
           },
           compress: {
             ecma: 2015,
-
+            passes: 1,
           }
         },
         extractComments: false,

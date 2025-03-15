@@ -26,18 +26,17 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
           const propName: string = windowProps[prop];
 
           // we only care about known window functions
-          if (safeTypeCheck(window, propName) !== 'function') {
-            console.log('not a function', propName, safeTypeCheck(window, propName))
-            continue;
-          }
+          if (safeTypeCheck(window, propName) !== 'function') continue;
+
+          // we only care about known window properties
           if (!knownWindowPropertyNames.includes(propName)) continue;
 
           const propDef = getDefinition(window, propName)
 
           // the prop is a class
-          if ((window[propName as unknown as number] as unknown as Function).prototype) {
+          if (getDescriptorValue(window, propName).prototype) {
 
-            // the whole class is a monkey patch
+            // the whole class is monkey patched
             if (!isNative(propName, propDef)) {
               patchedProps[propName] = getDescriptorValue(window, propName)
             }

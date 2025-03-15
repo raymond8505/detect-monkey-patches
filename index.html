@@ -7,19 +7,24 @@
     <title>Detect Monkey Patches</title>
 
     <script>
-        window.Foo = () => {
-            console.log('Foo')
+        window.CustomFunction = () => {
+            console.log('Custom function attached to window')
+        }
+        window.CustomClass = class CustomClass {
+            constructor() {
+                console.log('Custom class attached to window')
+            }
         }
         window.alert = (...args) => {
-            console.log(...args)
+            console.log('fake alert', ...args)
         }
         window.XMLHttpRequest = class fakeXHR {
             constructor() {
-                console.log('fakeXHR')
+                console.log('fake XHR')
             }
         }
         window.XMLSerializer.prototype.serializeToString = () => {
-            console.log('serializeToString')
+            console.log('fake serializeToString')
         }
 
         alert('patched test')
