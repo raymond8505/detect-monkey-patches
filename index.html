@@ -5,14 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detect Monkey Patches</title>
-    <script src="/detect-monkey-patches.js"></script>
-    <script defer src="/bookmarklet.js"></script>
+
     <script>
         window.Foo = () => {
             console.log('Foo')
         }
         window.alert = (...args) => {
             console.log(...args)
+        }
+        window.XMLHttpRequest = class fakeXHR {
+            constructor() {
+                console.log('fakeXHR')
+            }
         }
 
         alert('patched test')
@@ -21,6 +25,9 @@
             //fixMonkeyPatch('alert')('fixed test')
         })
     </script>
+
+    <script defer src="/detect-monkey-patches.js"></script>
+    <script defer src="/bookmarklet.js"></script>
 </head>
 
 <body>

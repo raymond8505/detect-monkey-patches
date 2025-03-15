@@ -15,6 +15,8 @@ export const knownAliases = [
   ["webkitSpeechRecognitionError", "SpeechRecognitionErrorEvent"],
   ["webkitSpeechRecognitionEvent", "SpeechRecognitionEvent"],
   ["webkitURL", "URL"],
+  ["WebKitCSSMatrix", "DOMMatrix"],
+  ["WebKitMutationObserver", "MutationObserver"],
 ];
 
 export const getNativeDef = (funcName: string) => `function ${funcName}() { [native code] }`;
@@ -97,11 +99,13 @@ export function getKnownWindowPropertyNames() {
     names.push(propName)
   }
 
-  document.body.removeChild(iframe);
+  removeCleanIframe();
 
   return names;
 }
-
+export function getDescriptorValue(obj: unknown, propName: string) {
+  return Object.getOwnPropertyDescriptor(obj, propName)?.value
+}
 /**
  * Some things don't like being touched
  * so we need to check if we can access them
@@ -109,10 +113,11 @@ export function getKnownWindowPropertyNames() {
  * @returns 
  */
 export function safeTypeCheck(obj: unknown, propName: string) {
-  const descriptor = Object.getOwnPropertyDescriptor(obj, propName)
-  return typeof descriptor?.value;
+  return typeof getDescriptorValue(obj, propName)
 }
-
+export function getDefinition(obj: unknown, propName: string) {
+  return getDescriptorValue(obj, propName)?.toString() ?? "unknown"
+}
 export function findMonkeyPatches(nativeTypeName: string): MonkeyPatches {
 
   try {

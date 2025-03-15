@@ -1,4 +1,4 @@
-import { suppressPromiseRejections, findMonkeyPatches, isNative, log, getKnownWindowPropertyNames, getCleanIframe, removeCleanIframe, safeTypeCheck } from './helpers'
+import { suppressPromiseRejections, findMonkeyPatches, isNative, getDescriptorValue, log, getKnownWindowPropertyNames, getCleanIframe, removeCleanIframe, safeTypeCheck, getDefinition } from './helpers'
 import type { PatchedProps } from './types'
 
 /**
@@ -13,53 +13,69 @@ export function detectMonkeyPatches(): Promise<PatchedProps> {
   log('detecting monkey patches')
   return new Promise((resolve, reject) => {
 
-    window.addEventListener("unhandledrejection", suppressPromiseRejections);
+    function init() {
 
-    try {
-      const windowProps = Object.getOwnPropertyNames(window);
-      const patchedProps: PatchedProps = {}
-      const knownWindowPropertyNames = getKnownWindowPropertyNames()
+      window.addEventListener("unhandledrejection", suppressPromiseRejections);
 
-      for (let prop in windowProps) {
-        const propName: string = windowProps[prop];
+      try {
+        const windowProps = Object.getOwnPropertyNames(window);
+        const patchedProps: PatchedProps = {}
+        const knownWindowPropertyNames = getKnownWindowPropertyNames()
 
-        // we only care about known window functions
-        if (!knownWindowPropertyNames.includes(propName)) continue;
-        if (safeTypeCheck(window, propName) !== 'function') continue;
+        for (let prop in windowProps) {
+          const propName: string = windowProps[prop];
 
-        // if the prop is a class
-        //if (/[A-Z]/.test(propName[0])) {
-        if ((window[propName as unknown as number] as unknown as Function).prototype) {
-          const mps = findMonkeyPatches(propName);
+          // we only care about known window functions
+          if (safeTypeCheck(window, propName) !== 'function') {
+            console.log('not a function', propName, safeTypeCheck(window, propName))
+            continue;
+          }
+          if (!knownWindowPropertyNames.includes(propName)) continue;
 
-          if (mps.length) {
-            patchedProps[propName] = mps
+          const propDef = getDefinition(window, propName)
+
+          // the prop is a class
+          if ((window[propName as unknown as number] as unknown as Function).prototype) {
+
+            // the whole class is a monkey patch
+            if (!isNative(propName, propDef)) {
+              patchedProps[propName] = getDescriptorValue(window, propName)
+            }
+            else {
+              const monkeyPatches = findMonkeyPatches(propName);
+
+              if (monkeyPatches.length) {
+                patchedProps[propName] = monkeyPatches
+              }
+            }
+          }
+          else if (!isNative(propName, propDef)) {
+            patchedProps[propName] = getDescriptorValue(window, propName)
           }
         }
-        else if (safeTypeCheck(window, propName) === 'function') {
 
-          const propDef = window[propName as unknown as number].toString()
-          if (!isNative(propName, propDef)) {
-            patchedProps[propName] = propDef
-          }
-
-        }
-
+        // remove the suppression after we're done
+        // 1ms timeout to make the call async 
+        // else it gets removed before the Promises actually reject
+        setTimeout(() => {
+          window.removeEventListener("unhandledrejection", suppressPromiseRejections);
+          resolve(patchedProps)
+          removeCleanIframe()
+        }, 1);
       }
-
-      // remove the suppression after we're done
-      // 1ms timeout to make the call async 
-      // else it gets removed before the Promises actually reject
-      setTimeout(() => {
-        window.removeEventListener("unhandledrejection", suppressPromiseRejections);
-        resolve(patchedProps)
+      catch (e) {
+        reject(e)
         removeCleanIframe()
-      }, 1);
+      }
     }
-    catch (e) {
-      reject(e)
-      removeCleanIframe()
+
+    if (document.readyState && document.readyState === 'complete') {
+      init()
     }
+    else {
+      document.addEventListener('DOMContentLoaded', init)
+    }
+
   })
 }
 
