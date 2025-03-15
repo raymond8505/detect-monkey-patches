@@ -1,6 +1,6 @@
 # Detect Monkey Patches
 
-Detect any native Javascript object functions that have had their definition overriden by a custom function, or "monkey patched".
+Detect any native Javascript window or object functions that have had their definition overriden by a custom function, or "monkey patched".
 
 Can be used to ensure javascript environment will work as expected. 
 Used as a bookmarklet it can help troubleshooting third party websites.
