@@ -149,7 +149,7 @@ export function findMonkeyPatches(nativeTypeName: string): MonkeyPatches {
         const funcIsNative = isNative(funcName, funcDef);
 
         if (!funcIsNative) {
-          foundMonkeyPatches.push([funcName, funcDef]);
+          foundMonkeyPatches.push([funcName, getDescriptorValue(nativeType.prototype, funcName)]);
         }
 
       } catch (e) {

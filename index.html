@@ -18,6 +18,9 @@
                 console.log('fakeXHR')
             }
         }
+        window.XMLSerializer.prototype.serializeToString = () => {
+            console.log('serializeToString')
+        }
 
         alert('patched test')
 
