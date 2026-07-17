@@ -14,7 +14,7 @@ Used as a bookmarklet it can help troubleshooting third party websites.
 3. Click the bookmarklet on any page to get a console log out of any monkey patches
 4. Right click any patched function or class and choose `show function definition` to see where it
 was changed
-5. Contact the developer who changed it and ask them who they think they are fucking around with
+5. Contact the developer who changed it and ask them who they think they are monkeying around with
 the Javascript environment we all share.
 
 ```
